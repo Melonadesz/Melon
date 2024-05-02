@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Screenshot Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: calc(100% - 85px); /* Adjusted width to accommodate the button */
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px; /* Rounded corners only on the left side */
+        }
+        button {
+            padding: 8px 20px; /* Adjusted padding */
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff; /* Added border */
+            border-radius: 0 4px 4px 0; /* Rounded corners only on the right side */
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .screenshot-img {
+            max-width: 100%;
+            margin-top: 20px;
+            cursor: pointer; /* Add cursor pointer to indicate clickable */
+        }
+    </style>
+</head>
+<body>
+    <h1>Website Screenshot Generator</h1>
+    <form id="screenshotForm" action="generate_screenshot.php" method="GET">
+        <label for="websiteUrl">Enter Website URL:</label>
+        <input type="text" id="websiteUrl" name="url" placeholder="https://example.com" required>
+        <button type="submit">Generate Screenshot</button>
+    </form>
+    <div id="screenshotContainer" style="display: none;">
+        <a id="screenshotLink" href="#" target="_blank"> <!-- Link added around the image -->
+            <img id="screenshotImg" class="screenshot-img" src="" alt="Screenshot">
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('screenshotForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const websiteUrl = document.getElementById('websiteUrl').value.trim();
+
+            try {
+                const response = await fetch(this.getAttribute('action') + '?' + new URLSearchParams(new FormData(this)));
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    const screenshotUrl = responseData.screenshotUrl;
+                    document.getElementById('screenshotImg').src = screenshotUrl;
+                    document.getElementById('screenshotLink').href = screenshotUrl; // Set the link's href attribute
+                    document.getElementById('screenshotContainer').style.display = 'block';
+                } else {
+                    throw new Error(responseData.error || 'Failed to generate screenshot');
+                }
+            } catch (error) {
+                console.error('Error:', error.message);
+            }
+        });
+    </script>
+</body>
+</html>
